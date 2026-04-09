@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Domain - Mechanical Engineering</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%);
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .menu-panel {
+            background-color: white;
+            width: 100%;
+            padding: 20px 40px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .menu-left img {
+            width: 120px;
+            height: auto;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .menu-center img {
+            width: 200px;
+            height: auto;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .menu-right img {
+            width: 80px;
+            height: auto;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .menu-left {
+            flex: 0 0 auto;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .menu-center {
+            flex: 1;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+        }
+
+        .menu-right {
+            flex: 0 0 auto;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .container {
+            background-color: white;
+            width: 100%;
+            padding: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .content-section {
+            padding: 40px;
+            background-color: white;
+        }
+
+        h2 {
+            color: #001f3f;
+            font-family: "Playfair Display", serif;
+            border-bottom: 2px solid #001f3f;
+            padding-bottom: 10px;
+            margin: 0 0 20px 0;
+            font-size: 32px;
+        }
+
+        p {
+            color: #555;
+            line-height: 1.8;
+            margin: 15px 0;
+            font-size: 16px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 25px;
+            background-color: #001f3f;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .back-link:hover {
+            background-color: #003d7a;
+        }
+
+        @media (max-width: 768px) {
+            .menu-panel {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+                padding: 15px 20px;
+            }
+
+            .menu-left img {
+                width: 80px;
+            }
+
+            .menu-center img {
+                width: 130px;
+            }
+
+            .menu-right img {
+                width: 60px;
+            }
+
+            .content-section {
+                padding: 30px 20px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="menu-panel">
+    <div class="menu-left">
+        <img src="image2.png" alt="Left Logo">
+    </div>
+    <div class="menu-center">
+        <img src="image3.png" alt="Center Logo">
+    </div>
+    <div class="menu-right">
+        <img src="image4.png" alt="Right Logo">
+    </div>
+</div>
+
+<div class="container">
+    <div class="content-section">
+        <h2>Mechanical Engineering</h2>
+        <p>
+            This domain focuses on <b>design and analysis</b> of mechanical systems, 
+            <i>manufacturing processes</i>, and maintenance of public infrastructure.
+        </p>
+
+        <p>
+            Interns may work on transport systems, public utility equipment, and 
+            energy-efficient mechanical solutions for government projects. You will gain 
+            practical experience in CAD software and mechanical simulations.
+        </p>
+
+        <p>
+            <b>Key Skills:</b> CAD Design, Mechanical Analysis, Manufacturing, ANSYS, Thermodynamics
+        </p>
+
+        <a href="successful_reg.html" class="back-link">Back to Domain List</a>
+    </div>
+</div>
+
+</body>
+</html>

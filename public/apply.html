@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Apply — Government Internship Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Source Sans 3', sans-serif;
+            background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%);
+            min-height: 100vh;
+            color: #333;
+            padding-bottom: 60px;
+        }
+
+        /* ── Nav bar (matches existing pages) ── */
+        .menu-panel {
+            background-color: white;
+            width: 100%;
+            padding: 20px 40px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+        .menu-left img   { width: 120px; height: auto; object-fit: contain; }
+        .menu-center     { flex: 1; text-align: center; }
+        .menu-center img { width: 200px; height: auto; object-fit: contain; }
+        .menu-right img  { width: 80px;  height: auto; object-fit: contain; }
+
+        /* ── Form card ── */
+        .form-card {
+            background: white;
+            max-width: 620px;
+            margin: 40px auto 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .form-card-header {
+            background: #001f3f;
+            color: white;
+            padding: 28px 36px;
+        }
+        .form-card-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px;
+            margin-bottom: 6px;
+        }
+        .form-card-header p {
+            font-size: 14px;
+            opacity: 0.75;
+        }
+
+        /* ── Position summary box ── */
+        .position-summary {
+            background: #f0f4f8;
+            border-left: 4px solid #001f3f;
+            margin: 28px 36px 0;
+            padding: 16px 20px;
+            border-radius: 0 4px 4px 0;
+        }
+        .position-summary .pos-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 17px;
+            color: #001f3f;
+            margin-bottom: 4px;
+        }
+        .position-summary .pos-domain {
+            font-size: 13px;
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        /* ── Form body ── */
+        .form-body { padding: 24px 36px 32px; }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            margin-bottom: 6px;
+            color: #001f3f;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input[type="text"],
+        input[type="email"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #bbb;
+            border-radius: 4px;
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: 14px;
+            color: #333;
+            transition: border-color 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #001f3f;
+        }
+        input[readonly] {
+            background: #f5f5f5;
+            color: #666;
+            cursor: not-allowed;
+        }
+        textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
+
+        .char-count {
+            text-align: right;
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+        .char-count.warn { color: #c0392b; }
+
+        /* ── Declaration checkbox ── */
+        .declaration {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 22px;
+            padding: 14px;
+            background: #fafafa;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+        .declaration input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            margin-top: 2px;
+            flex-shrink: 0;
+            accent-color: #001f3f;
+        }
+        .declaration label {
+            margin: 0;
+            font-size: 13px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        /* ── Buttons ── */
+        .btn-row { margin-top: 28px; display: flex; gap: 12px; }
+        .btn-submit {
+            flex: 1;
+            padding: 12px;
+            background: #001f3f;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Source Sans 3', sans-serif;
+            transition: background 0.2s;
+        }
+        .btn-submit:hover   { background: #003d7a; }
+        .btn-submit:disabled{ background: #aaa; cursor: not-allowed; }
+        .btn-back {
+            padding: 12px 20px;
+            background: white;
+            color: #001f3f;
+            border: 2px solid #001f3f;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Source Sans 3', sans-serif;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: background 0.2s, color 0.2s;
+        }
+        .btn-back:hover { background: #001f3f; color: white; }
+
+        /* ── Message box ── */
+        .message {
+            padding: 14px; border-radius: 4px;
+            margin: 0 36px 0;
+            font-weight: 600; font-size: 14px;
+            display: none;
+        }
+        .message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .message.error   { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        @media (max-width: 680px) {
+            .form-card       { margin: 20px 12px 0; }
+            .form-card-header{ padding: 22px 20px; }
+            .position-summary{ margin: 20px 20px 0; }
+            .form-body       { padding: 18px 20px 28px; }
+            .message         { margin: 0 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="menu-panel">
+    <div class="menu-left"> <img src="image2.png" alt="Left Logo">  </div>
+    <div class="menu-center"><img src="image3.png" alt="Center Logo"></div>
+    <div class="menu-right"> <img src="image4.png" alt="Right Logo"> </div>
+</div>
+
+<div class="form-card">
+
+    <div class="form-card-header">
+        <h2>Internship Application</h2>
+        <p>Fill in the details below and submit your application.</p>
+    </div>
+
+    <!-- Position summary — filled by JavaScript from URL params -->
+    <div class="position-summary">
+        <div class="pos-title"  id="positionTitle">Loading position...</div>
+        <div class="pos-domain" id="positionDomain"></div>
+    </div>
+
+    <div class="message" id="message"></div>
+
+    <div class="form-body">
+        <form id="applyForm">
+
+            <!-- Pre-filled from localStorage (logged-in user) -->
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" readonly placeholder="Loading...">
+
+            <label for="email">Email Address</label>
+            <input type="email" id="email" readonly placeholder="Loading...">
+
+            <label for="username">Username</label>
+            <input type="text" id="username" readonly placeholder="Loading...">
+
+            <!-- Pre-filled from URL but user can still change -->
+            <label for="domain">Applying For Domain</label>
+            <select id="domain">
+                <option value="cs">Computer Science</option>
+                <option value="eee">Electronics and Electrical Science</option>
+                <option value="aiml">Artificial Intelligence and Machine Learning</option>
+                <option value="mech">Mechanical Engineering</option>
+                <option value="aero">Aerospace Engineering</option>
+                <option value="science">Science and Research</option>
+            </select>
+
+            <label for="statement">
+                Personal Statement
+                <span style="font-weight:400; color:#888; font-size:12px;">
+                  — Why do you want this internship? (50–500 characters)
+                </span>
+            </label>
+            <textarea id="statement" maxlength="500"
+                placeholder="Describe your interest, relevant skills, and what you hope to gain from this internship..."></textarea>
+            <div class="char-count" id="charCount">0 / 500</div>
+
+            <!-- Declaration -->
+            <div class="declaration">
+                <input type="checkbox" id="declare" required>
+                <label for="declare">
+                    I declare that all the information provided is accurate and complete.
+                    I understand that any false information may result in disqualification.
+                </label>
+            </div>
+
+            <div class="btn-row">
+                <a href="options.html" class="btn-back">← Back</a>
+                <button type="submit" class="btn-submit" id="submitBtn">Submit Application</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script>
+    // ── 1. Read URL parameters (domain & position passed from options.html) ──
+    const params   = new URLSearchParams(window.location.search);
+    const domainParam   = params.get('domain')   || '';
+    const positionParam = params.get('position') || 'Internship Position';
+
+    const domainLabels = {
+        cs:      'Computer Science',
+        eee:     'Electronics & Electrical Science',
+        aiml:    'Artificial Intelligence & Machine Learning',
+        mech:    'Mechanical Engineering',
+        aero:    'Aerospace Engineering',
+        science: 'Science & Research'
+    };
+
+    // Show position info in summary box
+    document.getElementById('positionTitle').textContent  = decodeURIComponent(positionParam);
+    document.getElementById('positionDomain').textContent = domainLabels[domainParam] || domainParam;
+
+    // Pre-select the domain in the dropdown
+    if (domainParam) {
+        document.getElementById('domain').value = domainParam;
+    }
+
+    // ── 2. Pre-fill user details from localStorage ──
+    const userData = localStorage.getItem('loggedInUser');
+    let currentUser = null;
+    if (userData) {
+        currentUser = JSON.parse(userData);
+        document.getElementById('fullName').value = currentUser.fullName || '';
+        document.getElementById('email').value    = currentUser.email    || '';
+        document.getElementById('username').value = currentUser.username || '';
+    }
+
+    // ── 3. Live character counter ──
+    const textarea  = document.getElementById('statement');
+    const charCount = document.getElementById('charCount');
+    textarea.addEventListener('input', function () {
+        const len = this.value.length;
+        charCount.textContent = `${len} / 500`;
+        charCount.className   = len > 450 ? 'char-count warn' : 'char-count';
+    });
+
+    // ── 4. Form submission ──
+    document.getElementById('applyForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        // Basic checks
+        if (!currentUser) {
+            showMessage('You must be logged in to apply. Please login first.', 'error');
+            return;
+        }
+        const statement = textarea.value.trim();
+        if (statement.length < 50) {
+            showMessage('Please write at least 50 characters in your personal statement.', 'error');
+            return;
+        }
+        if (!document.getElementById('declare').checked) {
+            showMessage('Please accept the declaration before submitting.', 'error');
+            return;
+        }
+
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+
+        const payload = {
+            userId:    currentUser.id,
+            username:  currentUser.username,
+            fullName:  currentUser.fullName,
+            domain:    document.getElementById('domain').value,
+            statement: statement
+        };
+
+        try {
+            const response = await fetch('http://localhost:3000/api/apply', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showMessage('✅ Application submitted successfully! Redirecting to your status page...', 'success');
+                setTimeout(() => { window.location.href = 'status.html'; }, 2500);
+            } else {
+                showMessage(data.message, 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Application';
+            }
+
+        } catch (err) {
+            showMessage('Cannot connect to server. Please make sure the server is running.', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Application';
+        }
+    });
+
+    function showMessage(text, type) {
+        const box = document.getElementById('message');
+        box.textContent = text;
+        box.className = 'message ' + type;
+        box.style.display = 'block';
+        box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+</script>
+
+</body>
+</html>

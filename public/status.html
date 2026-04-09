@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Application Status — Government Internship Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Source Sans 3', sans-serif;
+            background: linear-gradient(135deg, #001f3f 0%, #003d7a 100%);
+            min-height: 100vh;
+            color: #333;
+            padding-bottom: 60px;
+        }
+
+        /* ── Nav bar ── */
+        .menu-panel {
+            background-color: white;
+            width: 100%;
+            padding: 20px 40px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+        .menu-left  { flex: 0 0 auto; }
+        .menu-center{ flex: 1; text-align: center; }
+        .menu-right { flex: 0 0 auto; }
+        .menu-left img   { width: 120px; height: auto; object-fit: contain; }
+        .menu-center img { width: 200px; height: auto; object-fit: contain; }
+        .menu-right img  { width: 80px;  height: auto; object-fit: contain; }
+
+        /* ── Page header ── */
+        .page-header {
+            background: white;
+            padding: 36px 50px 28px;
+            border-bottom: 3px solid #001f3f;
+        }
+        .page-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 30px;
+            color: #001f3f;
+            margin-bottom: 6px;
+        }
+        .page-header p { color: #666; font-size: 15px; }
+
+        /* ── Main content area ── */
+        .content {
+            max-width: 800px;
+            margin: 36px auto 0;
+            padding: 0 20px;
+        }
+
+        /* ── Loading spinner ── */
+        .loading {
+            text-align: center;
+            color: white;
+            padding: 60px 20px;
+            font-size: 16px;
+            opacity: 0.85;
+        }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── No applications state ── */
+        .empty-state {
+            background: white;
+            border-radius: 8px;
+            padding: 50px 30px;
+            text-align: center;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+        }
+        .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+        .empty-state h2 {
+            font-family: 'Playfair Display', serif;
+            color: #001f3f;
+            margin-bottom: 10px;
+        }
+        .empty-state p { color: #666; margin-bottom: 24px; line-height: 1.6; }
+        .btn-primary {
+            display: inline-block;
+            padding: 12px 28px;
+            background: #001f3f;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover { background: #003d7a; }
+
+        /* ── Application card ── */
+        .app-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            overflow: hidden;
+            animation: fadeUp 0.4s ease both;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .app-card:nth-child(2) { animation-delay: 0.08s; }
+        .app-card:nth-child(3) { animation-delay: 0.16s; }
+
+        /* coloured top strip based on status */
+        .card-strip { height: 5px; }
+        .strip-pending  { background: #f39c12; }
+        .strip-approved { background: #27ae60; }
+        .strip-rejected { background: #e74c3c; }
+
+        .card-inner { padding: 24px 28px; }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .position-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 19px;
+            color: #001f3f;
+        }
+        .domain-label {
+            font-size: 13px;
+            color: #888;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-top: 4px;
+        }
+
+        /* ── Status badge ── */
+        .status-badge {
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        .badge-pending  { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+        .badge-approved { background: #d4edda; color: #155724; border: 1px solid #28a745; }
+        .badge-rejected { background: #f8d7da; color: #721c24; border: 1px solid #dc3545; }
+
+        /* ── Status message ── */
+        .status-message {
+            padding: 14px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        .msg-pending  { background: #fffbf0; border-left: 4px solid #f39c12; color: #7d5a00; }
+        .msg-approved { background: #f0faf4; border-left: 4px solid #27ae60; color: #1a5c35; }
+        .msg-rejected { background: #fdf3f3; border-left: 4px solid #e74c3c; color: #7b1e1e; }
+
+        /* ── Card meta info ── */
+        .card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 13px;
+            color: #777;
+            border-top: 1px solid #eee;
+            padding-top: 14px;
+        }
+        .card-meta span { display: flex; align-items: center; gap: 5px; }
+
+        /* ── Statement section ── */
+        .statement-section { margin-bottom: 16px; }
+        .statement-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #999;
+            margin-bottom: 6px;
+        }
+        .statement-text {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.65;
+            background: #f9f9f9;
+            padding: 12px 14px;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+
+        /* ── Back link ── */
+        .back-row {
+            margin-bottom: 20px;
+        }
+        .back-link {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .back-link:hover { color: white; }
+        .back-link::before { content: "← "; }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .menu-panel { flex-wrap: wrap; justify-content: center; padding: 15px 20px; gap: 15px; }
+            .menu-left img   { width: 80px; }
+            .menu-center img { width: 130px; }
+            .menu-right img  { width: 60px; }
+            .page-header { padding: 24px 20px 18px; }
+            .page-header h1 { font-size: 22px; }
+            .card-inner { padding: 18px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="menu-panel">
+    <div class="menu-left"> <img src="image2.png" alt="Left Logo">  </div>
+    <div class="menu-center"><img src="image3.png" alt="Center Logo"></div>
+    <div class="menu-right"> <img src="image4.png" alt="Right Logo"> </div>
+</div>
+
+<div class="page-header">
+    <h1>My Application Status</h1>
+    <p>Track the status of your internship applications below.</p>
+</div>
+
+<div class="content">
+    <div class="back-row">
+        <a href="Successful_reg.html" class="back-link">Back to Dashboard</a>
+    </div>
+
+    <!-- Content injected by JavaScript -->
+    <div id="statusContent">
+        <div class="loading">
+            <div class="spinner"></div>
+            Loading your applications...
+        </div>
+    </div>
+</div>
+
+<script>
+    // ── Domain label map ──
+    const domainLabels = {
+        cs:      'Computer Science',
+        eee:     'Electronics & Electrical Science',
+        aiml:    'Artificial Intelligence & Machine Learning',
+        mech:    'Mechanical Engineering',
+        aero:    'Aerospace Engineering',
+        science: 'Science & Research'
+    };
+
+    // ── Status config (message + CSS classes) ──
+    const statusConfig = {
+        Pending: {
+            stripClass:   'strip-pending',
+            badgeClass:   'badge-pending',
+            msgClass:     'msg-pending',
+            icon:         '⏳',
+            message:      'Your application is under review. Our team will evaluate it shortly. Please check back in a few days.'
+        },
+        Approved: {
+            stripClass:   'strip-approved',
+            badgeClass:   'badge-approved',
+            msgClass:     'msg-approved',
+            icon:         '✅',
+            message:      'Congratulations! Your application has been approved. You will receive further instructions via email shortly.'
+        },
+        Rejected: {
+            stripClass:   'strip-rejected',
+            badgeClass:   'badge-rejected',
+            msgClass:     'msg-rejected',
+            icon:         '❌',
+            message:      'Unfortunately, your application was not selected this time. You are welcome to apply for other available positions.'
+        }
+    };
+
+    // ── Format a date nicely ──
+    function formatDate(dateStr) {
+        if (!dateStr) return '—';
+        return new Date(dateStr).toLocaleDateString('en-IN', {
+            day: 'numeric', month: 'long', year: 'numeric'
+        });
+    }
+
+    // ── Build one application card ──
+    function buildCard(app) {
+        const cfg    = statusConfig[app.status] || statusConfig['Pending'];
+        const domain = domainLabels[app.domain] || app.domain;
+
+        return `
+        <div class="app-card">
+            <div class="card-strip ${cfg.stripClass}"></div>
+            <div class="card-inner">
+                <div class="card-top">
+                    <div>
+                        <div class="position-name">${escapeHTML(app.domain.toUpperCase())} Internship</div>
+                        <div class="domain-label">${domain}</div>
+                    </div>
+                    <span class="status-badge ${cfg.badgeClass}">${cfg.icon} ${app.status}</span>
+                </div>
+
+                <div class="status-message ${cfg.msgClass}">
+                    ${cfg.message}
+                </div>
+
+                <div class="statement-section">
+                    <div class="statement-label">Your Personal Statement</div>
+                    <div class="statement-text">${escapeHTML(app.statement)}</div>
+                </div>
+
+                <div class="card-meta">
+                    <span>📅 Applied: ${formatDate(app.appliedAt)}</span>
+                    ${app.reviewedAt
+                        ? `<span>🔍 Reviewed: ${formatDate(app.reviewedAt)}</span>`
+                        : ''}
+                </div>
+            </div>
+        </div>`;
+    }
+
+    // ── Prevent XSS — always escape user-generated text ──
+    function escapeHTML(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    // ── Main: load applications from backend ──
+    async function loadStatus() {
+        const container = document.getElementById('statusContent');
+
+        // Check if user is logged in
+        const userData = localStorage.getItem('loggedInUser');
+        if (!userData) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">🔒</div>
+                    <h2>Not Logged In</h2>
+                    <p>Please log in to view your application status.</p>
+                    <a href="Login.html" class="btn-primary">Go to Login</a>
+                </div>`;
+            return;
+        }
+
+        const user = JSON.parse(userData);
+
+        try {
+            const response = await fetch(`http://localhost:3000/api/status/${user.id}`);
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.message);
+            }
+
+            const applications = data.applications;
+
+            // No applications yet
+            if (applications.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📋</div>
+                        <h2>No Applications Yet</h2>
+                        <p>You haven't applied for any internships yet.<br>
+                           Browse available positions and submit your first application!</p>
+                        <a href="options.html" class="btn-primary">Browse Positions</a>
+                    </div>`;
+                return;
+            }
+
+            // Build cards for each application
+            container.innerHTML = applications.map(buildCard).join('');
+
+        } catch (error) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">⚠️</div>
+                    <h2>Could Not Load Status</h2>
+                    <p>Unable to connect to the server. Please make sure the server is running and try again.</p>
+                    <a href="Successful_reg.html" class="btn-primary">Back to Dashboard</a>
+                </div>`;
+        }
+    }
+
+    // Run on page load
+    loadStatus();
+</script>
+
+</body>
+</html>

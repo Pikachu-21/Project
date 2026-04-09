@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel — Government Internship Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Source Sans 3', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* ── Sidebar layout ── */
+        .layout { display: flex; min-height: 100vh; }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            width: 240px;
+            background: #001f3f;
+            color: white;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0;
+            height: 100vh;
+            z-index: 100;
+        }
+        .sidebar-logo {
+            padding: 28px 24px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-logo h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 17px;
+            line-height: 1.4;
+        }
+        .sidebar-logo p {
+            font-size: 12px;
+            opacity: 0.55;
+            margin-top: 4px;
+        }
+
+        .sidebar-nav { padding: 20px 0; flex: 1; }
+        .nav-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            opacity: 0.45;
+            padding: 0 24px;
+            margin-bottom: 8px;
+            margin-top: 16px;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 24px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0.7;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            text-decoration: none;
+            color: white;
+        }
+        .nav-item:hover   { opacity: 1; background: rgba(255,255,255,0.06); }
+        .nav-item.active  { opacity: 1; border-left-color: white; background: rgba(255,255,255,0.1); }
+        .nav-item .icon   { font-size: 16px; width: 20px; text-align: center; }
+
+        .sidebar-footer {
+            padding: 20px 24px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 13px;
+            opacity: 0.6;
+        }
+        .logout-btn {
+            display: block;
+            margin-top: 8px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        .logout-btn:hover { opacity: 1; }
+
+        /* ── Main content ── */
+        .main {
+            margin-left: 240px;
+            flex: 1;
+            padding: 32px 36px;
+        }
+
+        /* ── Top bar ── */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .topbar h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px;
+            color: #001f3f;
+        }
+        .topbar p { color: #888; font-size: 14px; margin-top: 2px; }
+
+        /* ── Stats row ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px 22px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            border-left: 4px solid #001f3f;
+        }
+        .stat-card.pending  { border-left-color: #f39c12; }
+        .stat-card.approved { border-left-color: #27ae60; }
+        .stat-card.rejected { border-left-color: #e74c3c; }
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #001f3f;
+            line-height: 1;
+        }
+        .stat-label { font-size: 13px; color: #888; margin-top: 6px; font-weight: 600; }
+
+        /* ── Filter + search bar ── */
+        .controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .filter-btn {
+            padding: 7px 18px;
+            border: 2px solid #001f3f;
+            background: white;
+            color: #001f3f;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Source Sans 3', sans-serif;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover, .filter-btn.active { background: #001f3f; color: white; }
+        .search-box {
+            margin-left: auto;
+            padding: 8px 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Source Sans 3', sans-serif;
+            width: 220px;
+        }
+        .search-box:focus { outline: none; border-color: #001f3f; }
+
+        /* ── Applications table ── */
+        .table-wrap {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            overflow: hidden;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: #001f3f; color: white; }
+        thead th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.15s;
+            animation: fadeIn 0.3s ease both;
+        }
+        tbody tr:hover { background: #fafbff; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        td { padding: 14px 16px; font-size: 14px; color: #444; vertical-align: middle; }
+
+        .applicant-name { font-weight: 600; color: #001f3f; }
+        .applicant-user { font-size: 12px; color: #aaa; }
+
+        /* ── Status badges ── */
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .badge-pending  { background: #fff3cd; color: #856404; }
+        .badge-approved { background: #d4edda; color: #155724; }
+        .badge-rejected { background: #f8d7da; color: #721c24; }
+
+        /* ── Action buttons ── */
+        .action-btns { display: flex; gap: 8px; }
+        .btn-approve, .btn-reject, .btn-view {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Source Sans 3', sans-serif;
+            transition: opacity 0.2s;
+        }
+        .btn-approve { background: #27ae60; color: white; }
+        .btn-approve:hover { opacity: 0.85; }
+        .btn-reject  { background: #e74c3c; color: white; }
+        .btn-reject:hover  { opacity: 0.85; }
+        .btn-view    { background: #f0f4f8; color: #001f3f; }
+        .btn-view:hover    { background: #dde4ed; }
+        .btn-disabled { background: #eee; color: #bbb; cursor: not-allowed; }
+
+        /* ── Empty / loading states ── */
+        .table-message {
+            text-align: center;
+            padding: 50px 20px;
+            color: #aaa;
+            font-size: 15px;
+        }
+
+        /* ── Modal (view statement) ── */
+        .modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: white;
+            border-radius: 8px;
+            max-width: 520px;
+            width: 90%;
+            padding: 32px;
+            position: relative;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        }
+        .modal h3 {
+            font-family: 'Playfair Display', serif;
+            color: #001f3f;
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+        .modal .meta { font-size: 13px; color: #888; margin-bottom: 18px; }
+        .modal .statement-box {
+            background: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 16px;
+            font-size: 14px;
+            line-height: 1.7;
+            color: #444;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .modal-close {
+            position: absolute;
+            top: 16px; right: 20px;
+            font-size: 22px;
+            cursor: pointer;
+            color: #aaa;
+            background: none;
+            border: none;
+            line-height: 1;
+        }
+        .modal-close:hover { color: #333; }
+        .modal-actions { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
+
+        /* ── Toast notification ── */
+        .toast {
+            position: fixed;
+            bottom: 28px; right: 28px;
+            background: #001f3f;
+            color: white;
+            padding: 14px 22px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            z-index: 9999;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: #27ae60; }
+        .toast.error   { background: #e74c3c; }
+
+        /* ── Responsive ── */
+        @media (max-width: 900px) {
+            .sidebar { width: 200px; }
+            .main    { margin-left: 200px; padding: 20px; }
+        }
+        @media (max-width: 680px) {
+            .sidebar { display: none; }
+            .main    { margin-left: 0; padding: 16px; }
+            .search-box { width: 100%; }
+            thead th:nth-child(3),
+            td:nth-child(3) { display: none; } /* hide domain col on mobile */
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<div class="layout">
+<aside class="sidebar">
+    <div class="sidebar-logo">
+        <h2>Internship Portal</h2>
+        <p>Admin Dashboard</p>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-label">Manage</div>
+        <a class="nav-item active" onclick="showSection('applications')">
+            <span class="icon">📋</span> Applications
+        </a>
+        <a class="nav-item" onclick="showSection('users')">
+            <span class="icon">👥</span> Registered Users
+        </a>
+        <div class="nav-label">Navigate</div>
+        <a class="nav-item" href="Successful_reg.html">
+            <span class="icon">🏠</span> Student Portal
+        </a>
+        <a class="nav-item" href="options.html">
+            <span class="icon">🔍</span> View Listings
+        </a>
+    </nav>
+    <div class="sidebar-footer">
+        <div>Logged in as <strong id="adminName">Admin</strong></div>
+        <a class="logout-btn" href="Login.html">🚪 Logout</a>
+    </div>
+</aside>
+
+<!-- ── Main content ── -->
+<main class="main">
+
+    <!-- ══ APPLICATIONS SECTION ══ -->
+    <div id="section-applications">
+        <div class="topbar">
+            <div>
+                <h1>Applications</h1>
+                <p>Review, approve, or reject student internship applications.</p>
+            </div>
+            <button class="filter-btn" onclick="loadApplications()" style="border-radius:6px;">
+                🔄 Refresh
+            </button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-number" id="statTotal">—</div>
+                <div class="stat-label">Total Applications</div>
+            </div>
+            <div class="stat-card pending">
+                <div class="stat-number" id="statPending">—</div>
+                <div class="stat-label">Pending Review</div>
+            </div>
+            <div class="stat-card approved">
+                <div class="stat-number" id="statApproved">—</div>
+                <div class="stat-label">Approved</div>
+            </div>
+            <div class="stat-card rejected">
+                <div class="stat-number" id="statRejected">—</div>
+                <div class="stat-label">Rejected</div>
+            </div>
+        </div>
+
+        <!-- Filter + search -->
+        <div class="controls">
+            <button class="filter-btn active" onclick="filterApps('All', this)">All</button>
+            <button class="filter-btn" onclick="filterApps('Pending',  this)">⏳ Pending</button>
+            <button class="filter-btn" onclick="filterApps('Approved', this)">✅ Approved</button>
+            <button class="filter-btn" onclick="filterApps('Rejected', this)">❌ Rejected</button>
+            <input class="search-box" type="text" id="searchBox"
+                   placeholder="🔍 Search by name or username..."
+                   oninput="renderTable()">
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Applicant</th>
+                        <th>Domain</th>
+                        <th>Applied On</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="appTableBody">
+                    <tr><td colspan="6" class="table-message">Loading applications...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ══ USERS SECTION ══ -->
+    <div id="section-users" style="display:none;">
+        <div class="topbar">
+            <div>
+                <h1>Registered Users</h1>
+                <p>All students who have created an account on the portal.</p>
+            </div>
+            <button class="filter-btn" onclick="loadUsers()" style="border-radius:6px;">
+                🔄 Refresh
+            </button>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Full Name</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Domain</th>
+                        <th>Registered On</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <tr><td colspan="6" class="table-message">Loading users...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+</div>
+
+<!-- ── Statement modal ── -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <h3 id="modalName">Applicant Name</h3>
+        <div class="meta" id="modalMeta"></div>
+        <div class="statement-box" id="modalStatement"></div>
+        <div class="modal-actions">
+            <button class="btn-approve" id="modalApprove" onclick="reviewFromModal('Approved')">✅ Approve</button>
+            <button class="btn-reject"  id="modalReject"  onclick="reviewFromModal('Rejected')">❌ Reject</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Toast ── -->
+<div class="toast" id="toast"></div>
+
+<script>
+    // ── Domain labels ──
+    const domainLabels = {
+        cs: 'Computer Science', eee: 'Electronics & EE',
+        aiml: 'AI / ML', mech: 'Mechanical',
+        aero: 'Aerospace', science: 'Science & Research'
+    };
+
+    let allApplications = [];   // full list from server
+    let currentFilter   = 'All';
+    let currentModalId  = null; // application ID open in modal
+
+    // ── On page load ──
+    window.addEventListener('DOMContentLoaded', () => {
+        // Show admin name
+        const userData = localStorage.getItem('loggedInUser');
+        if (userData) {
+            const user = JSON.parse(userData);
+            document.getElementById('adminName').textContent = user.fullName || user.username;
+        }
+        loadApplications();
+    });
+
+    // ── Sidebar section toggle ──
+    function showSection(name) {
+        document.getElementById('section-applications').style.display = name === 'applications' ? '' : 'none';
+        document.getElementById('section-users').style.display        = name === 'users'        ? '' : 'none';
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        if (name === 'users') loadUsers();
+    }
+
+    // ────────────────────────────────────────────
+    //  APPLICATIONS
+    // ────────────────────────────────────────────
+    async function loadApplications() {
+        try {
+            const res  = await fetch('http://localhost:3000/api/admin/applications');
+            const data = await res.json();
+            if (!data.success) throw new Error();
+            allApplications = data.applications;
+            updateStats();
+            renderTable();
+        } catch {
+            document.getElementById('appTableBody').innerHTML =
+                '<tr><td colspan="6" class="table-message">⚠️ Could not load applications. Is the server running?</td></tr>';
+        }
+    }
+
+    function updateStats() {
+        const total    = allApplications.length;
+        const pending  = allApplications.filter(a => a.status === 'Pending').length;
+        const approved = allApplications.filter(a => a.status === 'Approved').length;
+        const rejected = allApplications.filter(a => a.status === 'Rejected').length;
+        document.getElementById('statTotal').textContent    = total;
+        document.getElementById('statPending').textContent  = pending;
+        document.getElementById('statApproved').textContent = approved;
+        document.getElementById('statRejected').textContent = rejected;
+    }
+
+    function filterApps(status, btn) {
+        currentFilter = status;
+        document.querySelectorAll('.controls .filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderTable();
+    }
+
+    function renderTable() {
+        const search  = document.getElementById('searchBox').value.toLowerCase();
+        let filtered  = allApplications;
+
+        if (currentFilter !== 'All') {
+            filtered = filtered.filter(a => a.status === currentFilter);
+        }
+        if (search) {
+            filtered = filtered.filter(a =>
+                a.fullName.toLowerCase().includes(search) ||
+                a.username.toLowerCase().includes(search)
+            );
+        }
+
+        const tbody = document.getElementById('appTableBody');
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="table-message">No applications found.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = filtered.map((app, i) => {
+            const badgeClass = {
+                Pending: 'badge-pending', Approved: 'badge-approved', Rejected: 'badge-rejected'
+            }[app.status] || 'badge-pending';
+
+            const isPending = app.status === 'Pending';
+            const approveBtn = isPending
+                ? `<button class="btn-approve" onclick="review('${app._id}','Approved')">✅ Approve</button>`
+                : `<button class="btn-approve btn-disabled" disabled>✅ Approve</button>`;
+            const rejectBtn = isPending
+                ? `<button class="btn-reject" onclick="review('${app._id}','Rejected')">❌ Reject</button>`
+                : `<button class="btn-reject btn-disabled" disabled>❌ Reject</button>`;
+
+            return `
+            <tr>
+                <td>${i + 1}</td>
+                <td>
+                    <div class="applicant-name">${escapeHTML(app.fullName)}</div>
+                    <div class="applicant-user">@${escapeHTML(app.username)}</div>
+                </td>
+                <td>${domainLabels[app.domain] || app.domain}</td>
+                <td>${formatDate(app.appliedAt)}</td>
+                <td><span class="badge ${badgeClass}">${app.status}</span></td>
+                <td>
+                    <div class="action-btns">
+                        <button class="btn-view" onclick="openModal('${app._id}')">👁 View</button>
+                        ${approveBtn}
+                        ${rejectBtn}
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    // ── Approve / Reject directly from table ──
+    async function review(appId, status) {
+        try {
+            const res  = await fetch(`http://localhost:3000/api/admin/review/${appId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+            const data = await res.json();
+            if (!data.success) throw new Error(data.message);
+
+            showToast(`Application ${status}!`, status === 'Approved' ? 'success' : 'error');
+            await loadApplications(); // refresh list
+        } catch (err) {
+            showToast('Could not update application.', 'error');
+        }
+    }
+
+    // ── Modal ──
+    function openModal(appId) {
+        const app = allApplications.find(a => a._id === appId);
+        if (!app) return;
+        currentModalId = appId;
+
+        document.getElementById('modalName').textContent =
+            app.fullName + ' (@' + app.username + ')';
+        document.getElementById('modalMeta').textContent =
+            (domainLabels[app.domain] || app.domain) + '  ·  Applied ' + formatDate(app.appliedAt) + '  ·  Status: ' + app.status;
+        document.getElementById('modalStatement').textContent = app.statement;
+
+        const isPending = app.status === 'Pending';
+        document.getElementById('modalApprove').disabled = !isPending;
+        document.getElementById('modalApprove').className = isPending ? 'btn-approve' : 'btn-approve btn-disabled';
+        document.getElementById('modalReject').disabled  = !isPending;
+        document.getElementById('modalReject').className  = isPending ? 'btn-reject'  : 'btn-reject btn-disabled';
+
+        document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    function closeModal() {
+        document.getElementById('modalOverlay').classList.remove('open');
+        currentModalId = null;
+    }
+
+    async function reviewFromModal(status) {
+        if (!currentModalId) return;
+        closeModal();
+        await review(currentModalId, status);
+    }
+
+    // Close modal on overlay click
+    document.getElementById('modalOverlay').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    // ────────────────────────────────────────────
+    //  USERS TABLE
+    // ────────────────────────────────────────────
+    async function loadUsers() {
+        try {
+            const res  = await fetch('http://localhost:3000/api/admin/users');
+            const data = await res.json();
+            if (!data.success) throw new Error();
+
+            const tbody = document.getElementById('userTableBody');
+            if (data.users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="table-message">No registered users yet.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = data.users.map((u, i) => `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td>${escapeHTML(u.fullName)}</td>
+                    <td>@${escapeHTML(u.username)}</td>
+                    <td>${escapeHTML(u.email)}</td>
+                    <td>${domainLabels[u.domain] || u.domain}</td>
+                    <td>${formatDate(u.createdAt)}</td>
+                </tr>`).join('');
+        } catch {
+            document.getElementById('userTableBody').innerHTML =
+                '<tr><td colspan="6" class="table-message">⚠️ Could not load users.</td></tr>';
+        }
+    }
+
+    // ────────────────────────────────────────────
+    //  HELPERS
+    // ────────────────────────────────────────────
+    function formatDate(dateStr) {
+        if (!dateStr) return '—';
+        return new Date(dateStr).toLocaleDateString('en-IN', {
+            day: 'numeric', month: 'short', year: 'numeric'
+        });
+    }
+
+    function escapeHTML(str) {
+        return String(str)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function showToast(message, type = '') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className   = 'toast ' + type;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+</script>
+
+</body>
+</html>
