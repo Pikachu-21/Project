@@ -1,8 +1,6 @@
-// ============================================================
-//  Government Internship Portal - Backend Server
+//  Government Internship Portal - Backend
 //  FILE: server.js
-//  Run with: node server.js
-// ============================================================
+
 
 // 1. Import required packages
 const express = require('express');       // Web framework
@@ -21,12 +19,12 @@ app.use(express.json());                  // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse form data
 app.use(express.static(path.join(__dirname, 'public'))); // Serve your HTML files
 
-// ============================================================
+
 //  4. Connect to MongoDB database
-// ============================================================
+
 mongoose.connect('mongodb://localhost:27017/internship_portal')
-  .then(() => console.log('✅ Connected to MongoDB successfully!'))
-  .catch(err => console.log('❌ MongoDB connection error:', err));
+  .then(() => console.log('Connected to MongoDB successfully!'))
+  .catch(err => console.log('MongoDB connection error:', err));
 
 // ============================================================
 //  5. Define Data Models (what gets stored in the database)
@@ -59,21 +57,17 @@ const applicationSchema = new mongoose.Schema({
 
 const Application = mongoose.model('Application', applicationSchema);
 
-// ============================================================
 //  6. API Routes
-// ============================================================
 
 // --- HEALTH CHECK ---
 // Visit http://localhost:3000/api/health to check if server is running
 app.get('/api/health', (req, res) => {
-  res.json({ message: '✅ Server is running!' });
+  res.json({ message: 'Server is running!' });
 });
 
-// -------------------------------------------------------
 //  REGISTRATION ROUTE
 //  POST /api/register
 //  Called when a student submits the registration form
-// -------------------------------------------------------
 app.post('/api/register', async (req, res) => {
   try {
     const { fullName, email, username, password, confirm, domain } = req.body;
@@ -97,7 +91,7 @@ app.post('/api/register', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Username or email already registered.' });
     }
 
-    // Hash the password before saving (NEVER store plain passwords!)
+    // Hash the password before saving
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Save the new user to the database
@@ -122,11 +116,10 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// -------------------------------------------------------
+
 //  LOGIN ROUTE
 //  POST /api/login
 //  Called when a student submits the login form
-// -------------------------------------------------------
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -147,7 +140,7 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid username or password.' });
     }
 
-    // Login successful — send back user info (never send the password!)
+    // Login successful — send back user info
     res.json({
       success: true,
       message: 'Login successful!',
@@ -167,11 +160,9 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// -------------------------------------------------------
 //  APPLY FOR INTERNSHIP ROUTE
 //  POST /api/apply
 //  Called when a student submits an application
-// -------------------------------------------------------
 app.post('/api/apply', async (req, res) => {
   try {
     const { userId, username, fullName, domain, statement } = req.body;
@@ -197,11 +188,9 @@ app.post('/api/apply', async (req, res) => {
   }
 });
 
-// -------------------------------------------------------
 //  GET APPLICATION STATUS ROUTE
 //  GET /api/status/:userId
 //  Called to check a student's application status
-// -------------------------------------------------------
 app.get('/api/status/:userId', async (req, res) => {
   try {
     const applications = await Application.find({ userId: req.params.userId });
@@ -211,11 +200,9 @@ app.get('/api/status/:userId', async (req, res) => {
   }
 });
 
-// -------------------------------------------------------
 //  ADMIN - GET ALL APPLICATIONS
 //  GET /api/admin/applications
 //  Admin can see all pending applications
-// -------------------------------------------------------
 app.get('/api/admin/applications', async (req, res) => {
   try {
     const applications = await Application.find().sort({ appliedAt: -1 });
@@ -225,11 +212,9 @@ app.get('/api/admin/applications', async (req, res) => {
   }
 });
 
-// -------------------------------------------------------
 //  ADMIN - REVIEW AN APPLICATION
 //  PATCH /api/admin/review/:applicationId
 //  Admin can approve or reject an application
-// -------------------------------------------------------
 app.patch('/api/admin/review/:applicationId', async (req, res) => {
   try {
     const { status } = req.body; // 'Approved' or 'Rejected'
@@ -255,10 +240,8 @@ app.patch('/api/admin/review/:applicationId', async (req, res) => {
   }
 });
 
-// -------------------------------------------------------
 //  GET ALL USERS (Admin only)
 //  GET /api/admin/users
-// -------------------------------------------------------
 app.get('/api/admin/users', async (req, res) => {
   try {
     // Never return passwords
@@ -269,10 +252,8 @@ app.get('/api/admin/users', async (req, res) => {
   }
 });
 
-// ============================================================
 //  7. Start the server
-// ============================================================
 app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
-  console.log(`📋 API Health Check: http://localhost:${PORT}/api/health`);
+  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`API Health Check: http://localhost:${PORT}/api/health`);
 });
